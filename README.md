@@ -113,6 +113,7 @@ Captured constraints are enforced:
 - `docs/picon.png`: GitHub copy of the climate entity picture.
 - `custom_components/carlo_milano_ir/picon.png`: bundled Home Assistant entity
   picture served by the integration.
+- `custom_components/carlo_milano_ir/brand/icon.png`: HACS brand icon.
 
 ## Protocol Notes
 

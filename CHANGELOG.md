@@ -17,6 +17,7 @@ This project follows a simple Keep a Changelog-style format.
 - Added a rudimentary assumed-state Climate entity for Home Assistant
   dashboards, automations, and HomeKit bridging.
 - Added a bundled picon/entity picture, also shown in the GitHub README.
+- Added a HACS brand icon under the integration's `brand` directory.
 - Added Celsius 17-30 C and Fahrenheit 62-86 F state generation from captured
   frames.
 - Added timer generation for the captured 0-24 hour range.
