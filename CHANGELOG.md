@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 This project follows a simple Keep a Changelog-style format.
 
+## [Unreleased]
+
+### Documentation
+
+- Added XIAO IR Mate / ESPHome IR/RF proxy setup notes to the README, matching
+  the proven hardware documentation style from the Z906 integration.
+- Clarified that the integration targets any compatible Home Assistant
+  `infrared.*` emitter, while the XIAO IR Mate is the tested reference setup.
+- Documented that the Seeed factory/demo firmware is not enough because Home
+  Assistant must expose a real `infrared.*` transmitter entity.
+- Added the current HACS publication status and custom-repository installation
+  flow.
+
 ## [0.1.1] - 2026-06-29
 
 ### Changed

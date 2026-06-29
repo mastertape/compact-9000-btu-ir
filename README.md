@@ -40,8 +40,45 @@ or of the wider white-label platform.
 - Tested reference emitter:
   `infrared.xiao_smart_ir_mate_ir_proxy_transmitter`.
 
-No ESPHome YAML changes, flashing, or device-specific ESPHome services are
-required by this integration.
+No AC-specific ESPHome YAML changes or device-specific ESPHome services are
+required by this integration. If you already have a working Home Assistant
+`infrared.*` transmitter entity, the integration can use it directly.
+
+## IR Hardware
+
+This integration is transport-agnostic. It does not know or care whether the IR
+emitter is a Seeed device, another ESPHome proxy, or a future Home Assistant
+infrared emitter. The only hardware contract is a Home Assistant entity in the
+`infrared` domain that can transmit commands.
+
+The tested reference emitter is a Seeed Studio XIAO IR Mate flashed with the
+official ESPHome IR/RF proxy firmware. ESPHome lists the XIAO IR Mate on its
+official [Ready-Made Projects](https://esphome.io/projects/?type=irrf) page
+under `Infrared & radio frequency proxy`. To reproduce the tested setup, open
+that page, choose `Infrared & radio frequency proxy`, pick `XIAO IR Mate`, and
+press `Connect` with the device attached to your computer. The page then flashes
+the ready-made ESPHome proxy firmware directly in the browser. After flashing,
+the resulting device can be adopted in the ESPHome dashboard. This firmware is
+important: the XIAO IR Mate does not ship from the factory with this Home
+Assistant infrared proxy firmware already installed.
+
+The recommended firmware source for reproducing the tested setup is the
+official
+[ESPHome infrared-proxies repository](https://github.com/esphome/infrared-proxies),
+which hosts YAML configurations for a curated set of known, tested devices that
+can serve as infrared proxies for Home Assistant.
+
+If you maintain the ESPHome configuration manually after adoption, keep the
+official IR/RF proxy role intact and verify that Home Assistant exposes an
+`infrared.*` transmitter entity for the device. The Compact 9000 BTU commands
+belong in this Home Assistant integration, not as one-off AC buttons or custom
+actions in ESPHome.
+
+This is different from the older Seeed factory demo firmware with `Signal0` ...
+`Signal9`, `Learn`, and `Send` style controls. That factory demo interface is
+not enough for this integration. This integration requires the ESPHome IR/RF
+proxy firmware, because Home Assistant must see a real `infrared.*` emitter
+entity so commands can flow through Home Assistant's official infrared API.
 
 ## Compatibility And Confirmation Wanted
 
@@ -273,22 +310,51 @@ manufacturer without evidence.
 
 ## Installation
 
-Copy this repository into Home Assistant as a custom integration, or install it
-through HACS once published.
+Install this repository through HACS as a custom repository, or copy it into
+Home Assistant manually as a custom integration.
 
 ### HACS
 
-When the repository is available in your HACS installation, search for
-**Compact 9000 BTU IR** under HACS integrations, download it, and restart
-Home Assistant.
+This repository is prepared for HACS and currently installs as a custom
+repository. In HACS:
 
-For custom-repository installation, add:
+1. Open HACS.
+2. Go to `Integrations`.
+3. Open the three-dot menu in the top right.
+4. Select `Custom repositories`.
+5. Add this repository URL:
 
-```text
-https://github.com/mastertape/compact-9000-btu-ir
-```
+   ```text
+   https://github.com/mastertape/compact-9000-btu-ir
+   ```
 
-as an integration repository in HACS.
+6. Select category `Integration`.
+7. Download `Compact 9000 BTU IR`.
+8. Restart Home Assistant.
+
+When the project is accepted into the HACS default repository list, it should
+also be discoverable by searching for **Compact 9000 BTU IR**, **Carlo Milano**,
+**electriQ Compact**, or related compatibility terms in HACS.
+
+### HACS Publication Status
+
+Current in-repository status:
+
+- HACS metadata is present in `hacs.json`.
+- The integration manifest includes the HACS-required metadata keys.
+- HACS validation and Hassfest GitHub Actions are included and passing.
+- Local brand images are included in
+  `custom_components/carlo_milano_ir/brand/`.
+- Versioned GitHub releases should be used for installs and updates.
+- The repository is not yet in the HACS default repository list; use the custom
+  repository installation flow above for now.
+
+Note: Home Assistant 2026.3+ supports local brand images for custom
+integrations. The icon may still appear as `icon not available` in some HACS
+repository overview lists if that view uses the older
+`brands.home-assistant.io` CDN path instead of Home Assistant's local brands
+API. The integration itself ships local brand assets, and Home Assistant can use
+them in contexts that read the local brand folder.
 
 After installation, restart Home Assistant. Then add the integration from:
 
