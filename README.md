@@ -538,6 +538,27 @@ This project is a Home Assistant consumer of the official `infrared` entity
 platform. ESPHome IR/RF proxy devices should remain generic transport emitters
 and receivers; model-specific Compact 9000 BTU behavior belongs here.
 
+## Tests
+
+The file `tests/test_compact_9000_btu_ir.py` is a small developer test suite
+for the reverse-engineered protocol helpers. It is not loaded by Home Assistant
+and is not part of the runtime integration.
+
+The tests protect the captured protocol behavior while the project evolves.
+They currently cover:
+
+- 9-byte hex frame parsing and checksum validation
+- Celsius and Fahrenheit state generation
+- mode, fan, swing, and timer encoding
+- raw timing generation for Home Assistant infrared sends
+- decoding helpers for future receiver-side state sync
+
+They can be run locally with:
+
+```bash
+python3 tests/test_compact_9000_btu_ir.py
+```
+
 ## License And Trademarks
 
 This project is licensed under the Apache License 2.0.

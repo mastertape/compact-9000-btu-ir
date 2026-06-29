@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project follows a simple Keep a Changelog-style format.
 
+## [Unreleased]
+
+### Documentation
+
+- Explained the purpose of `tests/test_compact_9000_btu_ir.py` in the README.
+
 ## [0.2.2] - 2026-06-29
 
 ### Fixed
