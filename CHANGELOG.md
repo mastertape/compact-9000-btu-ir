@@ -4,18 +4,38 @@ All notable changes to this project will be documented in this file.
 
 This project follows a simple Keep a Changelog-style format.
 
-## [Unreleased]
+## [0.2.0] - 2026-06-29
 
 ### Documentation
 
-- Added XIAO IR Mate / ESPHome IR/RF proxy setup notes to the README, matching
-  the proven hardware documentation style from the Z906 integration.
+- Added XIAO IR Mate / ESPHome IR/RF proxy setup notes to the README.
 - Clarified that the integration targets any compatible Home Assistant
   `infrared.*` emitter, while the XIAO IR Mate is the tested reference setup.
 - Documented that the Seeed factory/demo firmware is not enough because Home
   Assistant must expose a real `infrared.*` transmitter entity.
 - Added the current HACS publication status and custom-repository installation
   flow.
+- Added a roadmap for improved climate control, HomeKit/Alexa/Google Home
+  friendliness, Max Cool/Sleep follow-up work, and future IR receiver state
+  synchronization.
+- Added a beginner-friendly mission/setup overview and community capture guide.
+- Moved the public roadmap into `docs/roadmap.md` and linked decoding guidance
+  from the README.
+
+### Changed
+
+- Renamed the Home Assistant integration domain from `carlo_milano_ir` to
+  `compact_9000_btu_ir`.
+- Renamed the custom integration folder and service examples to
+  `custom_components/compact_9000_btu_ir` and `compact_9000_btu_ir.*`.
+- Removed the public README reference to the internal architecture reference
+  project.
+
+### Breaking
+
+- Existing test installs using `carlo_milano_ir.*` services or YAML markers must
+  remove the old custom integration/config entry and reinstall this repository
+  as `compact_9000_btu_ir`.
 
 ## [0.1.1] - 2026-06-29
 
@@ -26,8 +46,9 @@ This project follows a simple Keep a Changelog-style format.
   confirmed test device, while electriQ Compact, COMPACT-V2, Compact 9000 BTU
   white-label units, and `TROTEC_3550` protocol-compatible devices are visible
   as search and confirmation targets.
-- Kept the technical Home Assistant domain `carlo_milano_ir` unchanged for
-  compatibility with existing test installs.
+- Kept the original technical Home Assistant domain unchanged for compatibility
+  with existing test installs. This was superseded in the 0.2.0 domain rename
+  above.
 
 ## [0.1.0] - 2026-06-29
 

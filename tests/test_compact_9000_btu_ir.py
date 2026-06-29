@@ -1,4 +1,4 @@
-"""Tests for Carlo Milano NX-7532 capture helpers."""
+"""Tests for Compact 9000 BTU IR capture helpers."""
 
 import importlib.util
 import sys
@@ -6,8 +6,8 @@ import types
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE_NAME = "custom_components.carlo_milano_ir"
-PACKAGE_PATH = ROOT / "custom_components" / "carlo_milano_ir"
+PACKAGE_NAME = "custom_components.compact_9000_btu_ir"
+PACKAGE_PATH = ROOT / "custom_components" / "compact_9000_btu_ir"
 
 package = types.ModuleType(PACKAGE_NAME)
 package.__path__ = [str(PACKAGE_PATH)]
@@ -41,8 +41,8 @@ ir = importlib.util.module_from_spec(ir_spec)
 sys.modules[f"{PACKAGE_NAME}.ir"] = ir
 ir_spec.loader.exec_module(ir)
 
-CarloMilanoCommand = ir.CarloMilanoCommand
-CarloMilanoValidationError = ir.CarloMilanoValidationError
+Compact9000BtuCommand = ir.Compact9000BtuCommand
+Compact9000BtuValidationError = ir.Compact9000BtuValidationError
 build_max_cool_state = ir.build_max_cool_state
 build_state = ir.build_state
 calc_checksum = ir.calc_checksum
@@ -66,7 +66,7 @@ def test_parse_hex_rejects_bad_checksum() -> None:
     """Checksum mismatches are rejected."""
     try:
         parse_hex_code("55 D2 00 19 00 00 31 80 F0")
-    except CarloMilanoValidationError as err:
+    except Compact9000BtuValidationError as err:
         assert "checksum mismatch" in str(err)
     else:
         raise AssertionError("bad checksum was accepted")
@@ -173,14 +173,14 @@ def test_build_state_rejects_out_of_range_fahrenheit() -> None:
             fan="high",
             swing=False,
         )
-    except CarloMilanoValidationError as err:
+    except Compact9000BtuValidationError as err:
         assert "temperature must be between 62 and 86 °F" in str(err)
     else:
         raise AssertionError("out-of-range Fahrenheit temperature was accepted")
 
 
 def test_build_state_rejects_below_manual_cool_range() -> None:
-    """The Carlo Milano manual documents COOL setpoints as 17-30 C."""
+    """The Compact 9000 BTU manual documents COOL setpoints as 17-30 C."""
     try:
         build_state(
             power=True,
@@ -189,10 +189,10 @@ def test_build_state_rejects_below_manual_cool_range() -> None:
             fan="high",
             swing=False,
         )
-    except CarloMilanoValidationError as err:
+    except Compact9000BtuValidationError as err:
         assert "temperature must be between 17 and 30" in str(err)
     else:
-        raise AssertionError("16 C was accepted for Carlo Milano send_state")
+        raise AssertionError("16 C was accepted for Compact 9000 BTU send_state")
 
 
 def test_build_state_matches_fan_and_swing_captures() -> None:
@@ -236,7 +236,7 @@ def test_build_state_matches_fan_and_swing_captures() -> None:
 
 
 def test_build_state_matches_mode_captures() -> None:
-    """Mode low bits match the captured Carlo Milano MODE cycle."""
+    """Mode low bits match the captured Compact 9000 BTU MODE cycle."""
     assert (
         format_state(
             build_state(
@@ -285,7 +285,7 @@ def test_build_state_rejects_uncaptured_mode_fan_combinations() -> None:
             fan="high",
             swing=False,
         )
-    except CarloMilanoValidationError as err:
+    except Compact9000BtuValidationError as err:
         assert "dry mode" in str(err)
     else:
         raise AssertionError("uncaptured dry fan setting was accepted")
@@ -298,7 +298,7 @@ def test_build_state_rejects_uncaptured_mode_fan_combinations() -> None:
             fan="low",
             swing=False,
         )
-    except CarloMilanoValidationError as err:
+    except Compact9000BtuValidationError as err:
         assert "fan_only mode" in str(err)
     else:
         raise AssertionError("uncaptured fan_only fan setting was accepted")
@@ -360,7 +360,7 @@ def test_build_state_rejects_out_of_range_timer_hour() -> None:
             swing=False,
             timer_hours=25,
         )
-    except CarloMilanoValidationError as err:
+    except Compact9000BtuValidationError as err:
         assert "timer_hours must be between 0 and 24" in str(err)
     else:
         raise AssertionError("out-of-range timer hour was accepted")
@@ -378,7 +378,7 @@ def test_build_state_rejects_fahrenheit_timer_combination() -> None:
             swing=False,
             timer_hours=1,
         )
-    except CarloMilanoValidationError as err:
+    except Compact9000BtuValidationError as err:
         assert "not captured yet" in str(err)
     else:
         raise AssertionError("uncaptured Fahrenheit timer combination was accepted")
@@ -402,7 +402,7 @@ def test_build_state_preserves_timer_with_other_captured_modes() -> None:
 
 
 def test_encode_timings_uses_capture_msb_first() -> None:
-    """Timing generation follows the observed Carlo Milano MSB-first captures."""
+    """Timing generation follows the observed Compact 9000 BTU MSB-first captures."""
     state = bytes.fromhex("55 D2 00 19 00 00 31 80 F1")
     timings = encode_timings(state)
 
@@ -442,7 +442,7 @@ def test_command_repeat_replays_full_frame_after_gap() -> None:
     """Repeat appends a full second frame after the observed message gap."""
     state = bytes.fromhex("55 D2 00 19 00 00 31 80 F1")
     frame = encode_timings(state)
-    timings = CarloMilanoCommand(state=state, repeat_count=1).get_raw_timings()
+    timings = Compact9000BtuCommand(state=state, repeat_count=1).get_raw_timings()
 
     assert timings[: len(frame)] == frame
     assert timings[len(frame)] == -100000

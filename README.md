@@ -3,9 +3,8 @@
 ![Compact 9000 BTU IR](docs/hero.png)
 
 Home Assistant custom integration that adds a Compact 9000 BTU assumed-state
-climate entity and the technical `carlo_milano_ir` service domain for portable
-air conditioners controlled through Home Assistant's `infrared` entity
-platform.
+climate entity and the `compact_9000_btu_ir` service domain for portable air
+conditioners controlled through Home Assistant's `infrared` entity platform.
 
 The confirmed test device is a PEARL / Carlo Milano NX-7532-675 with REV1_2016
 remote. The project is named around the broader Compact 9000 BTU white-label
@@ -33,6 +32,23 @@ BTU name. IRremoteESP8266's `TROTEC_3550` implementation is used as a protocol
 compatibility cross-check for timing and bit-field hypotheses. This does not
 claim that Trotec is the manufacturer or origin of the tested Carlo Milano unit
 or of the wider white-label platform.
+
+## Mission
+
+The goal is to make compact 9000 BTU white-label portable AC units usable like
+normal Home Assistant climate devices, without moving device-specific AC logic
+into ESPHome.
+
+This project should stay:
+
+- beginner-friendly for people who just want to flash an IR proxy, install a
+  HACS custom repository, and add a climate entity
+- useful for HomeKit, Alexa, and Google Home through normal Home Assistant
+  climate semantics
+- transparent for the community, with captured frames, decoding notes, and
+  compatibility evidence documented instead of hidden in private notes
+- conservative about protocol claims: no invented codes, no manufacturer claims
+  without sources, and no “looks similar” compatibility without captures
 
 ## Requirements
 
@@ -103,19 +119,36 @@ manual links, type-plate data, or checksum-valid IR frames. See
 [compatibility research](docs/compatibility.md) for the evidence that is most
 useful.
 
+## Beginner Setup Overview
+
+The intended beginner path is:
+
+1. Flash a compatible IR proxy such as the Seeed Studio XIAO IR Mate with the
+   official ESPHome IR/RF proxy firmware.
+2. Adopt the proxy in ESPHome.
+3. Verify that Home Assistant shows an `infrared.*` transmitter entity.
+4. Install this repository in HACS as a custom integration.
+5. Restart Home Assistant.
+6. Add **Compact 9000 BTU IR** from Settings -> Devices & services.
+7. Select the `infrared.*` transmitter entity.
+8. Test with the Climate entity or one of the documented service actions.
+
+The proxy is only the transport. The AC protocol, captures, presets, checksums,
+and future receive-side state sync belong in this Home Assistant integration.
+
 ## What v0.1 Provides
 
 - A rudimentary assumed-state Climate entity for Home Assistant dashboards,
   automations, and HomeKit bridging.
 - A bundled picon/entity picture for the climate entity.
-- `carlo_milano_ir.send_hex`
-- `carlo_milano_ir.send_state`
-- `carlo_milano_ir.send_max_cool`
+- `compact_9000_btu_ir.send_hex`
+- `compact_9000_btu_ir.send_state`
+- `compact_9000_btu_ir.send_max_cool`
 - Compact 9000 BTU protocol checksum validation.
 - Raw Home Assistant infrared timing generation based on the measured Compact 9000 BTU captures.
 - Internal decode helpers for future receiver-side state sync.
 - Config-entry loading with YAML import, matching the Home Assistant 2026.6+
-  loading pattern used by the current Z906 reference integration.
+  custom-integration loading pattern.
 - No receiver-side state sync yet. v0.1 is intentionally optimistic because IR
   is one-way until listener support is added.
 
@@ -126,7 +159,7 @@ through the UI or YAML import. It sends full captured-style IR states through th
 configured `infrared.*` transmitter.
 
 The bundled entity picture is served by the integration at
-`/carlo_milano_ir/picon.png` and is also included as `docs/picon.png` for GitHub
+`/compact_9000_btu_ir/picon.png` and is also included as `docs/picon.png` for GitHub
 use. Additional GitHub documentation artwork is kept in `docs/hero.png` and
 `docs/product.png`.
 
@@ -150,9 +183,9 @@ Captured constraints are enforced:
 - `docs/hero.png`: GitHub README hero image.
 - `docs/product.png`: neutral product-style documentation image.
 - `docs/picon.png`: GitHub copy of the climate entity picture.
-- `custom_components/carlo_milano_ir/picon.png`: bundled Home Assistant entity
+- `custom_components/compact_9000_btu_ir/picon.png`: bundled Home Assistant entity
   picture served by the integration.
-- `custom_components/carlo_milano_ir/brand/icon.png`: HACS brand icon.
+- `custom_components/compact_9000_btu_ir/brand/icon.png`: HACS brand icon.
 
 ## Protocol Notes
 
@@ -162,6 +195,8 @@ Detailed research notes:
 
 - [Compatibility and white-label research](docs/compatibility.md)
 - [Protocol research notes](docs/protocol-research.md)
+- [Community capture and decoding guide](docs/community-captures.md)
+- [Roadmap](docs/roadmap.md)
 
 Confirmed from captures:
 
@@ -345,7 +380,7 @@ Current in-repository status:
 - The integration manifest includes the HACS-required metadata keys.
 - HACS validation and Hassfest GitHub Actions are included and passing.
 - Local brand images are included in
-  `custom_components/carlo_milano_ir/brand/`.
+  `custom_components/compact_9000_btu_ir/brand/`.
 - Versioned GitHub releases should be used for installs and updates.
 - The repository is not yet in the HACS default repository list; use the custom
   repository installation flow above for now.
@@ -364,7 +399,7 @@ Settings -> Devices & services -> Add integration -> Compact 9000 BTU IR
 The integration also supports importing an existing YAML marker such as:
 
 ```yaml
-carlo_milano_ir:
+compact_9000_btu_ir:
 ```
 
 For new installs, the UI setup is preferred.
@@ -374,7 +409,7 @@ For new installs, the UI setup is preferred.
 ### Send Known Hex Frame
 
 ```yaml
-action: carlo_milano_ir.send_hex
+action: compact_9000_btu_ir.send_hex
 data:
   entity_id: infrared.xiao_smart_ir_mate_ir_proxy_transmitter
   code: "55 D2 00 19 00 00 31 88 F9"
@@ -385,7 +420,7 @@ Expected meaning from captures: Cool, 29 C, Fan High, Swing Off, Power On.
 ### Send Off Test Frame
 
 ```yaml
-action: carlo_milano_ir.send_hex
+action: compact_9000_btu_ir.send_hex
 data:
   entity_id: infrared.xiao_smart_ir_mate_ir_proxy_transmitter
   code: "55 70 00 0E 00 00 31 88 8C"
@@ -394,7 +429,7 @@ data:
 ### Build A State
 
 ```yaml
-action: carlo_milano_ir.send_state
+action: compact_9000_btu_ir.send_state
 data:
   entity_id: infrared.xiao_smart_ir_mate_ir_proxy_transmitter
   power: true
@@ -424,7 +459,7 @@ This generates:
 ### Build A Fahrenheit State
 
 ```yaml
-action: carlo_milano_ir.send_state
+action: compact_9000_btu_ir.send_state
 data:
   entity_id: infrared.xiao_smart_ir_mate_ir_proxy_transmitter
   power: true
@@ -444,7 +479,7 @@ This generates:
 ### Build A Timer State
 
 ```yaml
-action: carlo_milano_ir.send_state
+action: compact_9000_btu_ir.send_state
 data:
   entity_id: infrared.xiao_smart_ir_mate_ir_proxy_transmitter
   power: true
@@ -464,7 +499,7 @@ This generates the captured selected-timer frame:
 ### Send Max Cool
 
 ```yaml
-action: carlo_milano_ir.send_max_cool
+action: compact_9000_btu_ir.send_max_cool
 data:
   entity_id: infrared.xiao_smart_ir_mate_ir_proxy_transmitter
   swing: false
@@ -488,11 +523,17 @@ integration includes local decode helpers for Compact 9000 BTU frames, but it do
 not yet create a receiver-bound entity. Receiver-based remote-control state sync
 is planned for a later climate-entity version.
 
+## Roadmap
+
+See [docs/roadmap.md](docs/roadmap.md) for planned follow-up work around
+improved Climate behavior, HomeKit/Alexa/Google Home friendliness, Max Cool,
+Sleep mode, and future IR receiver state synchronization.
+
 ## Development Scope
 
-The existing Logitech Z906 integration was used only as an architectural
-reference for Home Assistant infrared service registration. It is not modified
-or required.
+This project is a Home Assistant consumer of the official `infrared` entity
+platform. ESPHome IR/RF proxy devices should remain generic transport emitters
+and receivers; model-specific Compact 9000 BTU behavior belongs here.
 
 ## License And Trademarks
 

@@ -37,7 +37,7 @@ from .const import (
     TEMP_MIN_C,
     TEMP_UNIT_CELSIUS,
 )
-from .ir import CarloMilanoValidationError, async_send_carlo_milano, build_state
+from .ir import Compact9000BtuValidationError, async_send_compact_9000_btu, build_state
 
 PARALLEL_UPDATES = 1
 
@@ -65,10 +65,10 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up the Compact 9000 BTU climate entity from a config entry."""
-    async_add_entities([CarloMilanoClimate(entry)])
+    async_add_entities([Compact9000BtuClimate(entry)])
 
 
-class CarloMilanoClimate(RestoreEntity, ClimateEntity):
+class Compact9000BtuClimate(RestoreEntity, ClimateEntity):
     """Assumed-state climate entity for the IR-only Compact 9000 BTU AC."""
 
     _attr_assumed_state = True
@@ -99,7 +99,7 @@ class CarloMilanoClimate(RestoreEntity, ClimateEntity):
 
     def __init__(self, entry: ConfigEntry) -> None:
         """Initialize the Compact 9000 BTU climate entity."""
-        self._attr_unique_id = "carlo_milano_compact_9000_btu_ac"
+        self._attr_unique_id = "compact_9000_btu_ac"
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, "compact_9000_btu_ac")},
             manufacturer="Compact 9000 BTU platform",
@@ -250,14 +250,14 @@ class CarloMilanoClimate(RestoreEntity, ClimateEntity):
                 swing=self._attr_swing_mode == SWING_VERTICAL,
                 temperature_unit=TEMP_UNIT_CELSIUS,
             )
-        except CarloMilanoValidationError as err:
+        except Compact9000BtuValidationError as err:
             raise ServiceValidationError(
                 translation_domain=DOMAIN,
                 translation_key="invalid_state",
                 translation_placeholders={"error": str(err)},
             ) from err
 
-        await async_send_carlo_milano(
+        await async_send_compact_9000_btu(
             self.hass,
             self._emitter_entity_id,
             state,

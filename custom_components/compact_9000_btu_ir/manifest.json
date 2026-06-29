@@ -1,5 +1,5 @@
 {
-  "domain": "carlo_milano_ir",
+  "domain": "compact_9000_btu_ir",
   "name": "Compact 9000 BTU IR",
   "after_dependencies": ["http", "infrared"],
   "codeowners": ["@mastertape"],
@@ -10,5 +10,5 @@
   "issue_tracker": "https://github.com/mastertape/compact-9000-btu-ir/issues",
   "requirements": ["infrared-protocols>=3.2.0"],
   "single_config_entry": true,
-  "version": "0.1.1"
+  "version": "0.2.0"
 }

@@ -20,7 +20,7 @@ def _infrared_entity_id(value: str) -> str:
     return entity_id
 
 
-class CarloMilanoIrConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class Compact9000BtuIrConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Compact 9000 BTU IR."""
 
     VERSION = 1

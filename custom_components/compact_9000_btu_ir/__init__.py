@@ -37,8 +37,8 @@ from .const import (
     TEMP_UNITS,
 )
 from .ir import (
-    CarloMilanoValidationError,
-    async_send_carlo_milano,
+    Compact9000BtuValidationError,
+    async_send_compact_9000_btu,
     build_max_cool_state,
     build_state,
     parse_hex_code,
@@ -57,12 +57,12 @@ def _infrared_entity_id(value: str) -> str:
     return entity_id
 
 
-def _carlo_milano_hex_code(value: str) -> str:
-    """Validate a Carlo Milano capture hex code and keep the original string."""
+def _compact_9000_btu_hex_code(value: str) -> str:
+    """Validate a Compact 9000 BTU capture hex code and keep the original string."""
     value = cv.string(value)
     try:
         parse_hex_code(value)
-    except CarloMilanoValidationError as err:
+    except Compact9000BtuValidationError as err:
         raise vol.Invalid(str(err)) from err
     return value
 
@@ -70,7 +70,7 @@ def _carlo_milano_hex_code(value: str) -> str:
 SEND_HEX_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_ENTITY_ID): _infrared_entity_id,
-        vol.Required(CONF_CODE): _carlo_milano_hex_code,
+        vol.Required(CONF_CODE): _compact_9000_btu_hex_code,
         vol.Optional(CONF_REPEAT, default=0): vol.All(
             vol.Coerce(int), vol.Range(min=0, max=MAX_REPEAT)
         ),
@@ -112,7 +112,7 @@ CONFIG_SCHEMA = vol.Schema({DOMAIN: vol.Any(None, {})}, extra=vol.ALLOW_EXTRA)
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up Carlo Milano IR services."""
+    """Set up Compact 9000 BTU IR services."""
     _LOGGER.info("Setting up %s", DOMAIN)
     domain_config = config.get(DOMAIN) or {}
     await hass.http.async_register_static_paths(
@@ -126,17 +126,17 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     )
 
     async def async_send_hex(call: ServiceCall) -> None:
-        """Send a validated Carlo Milano capture frame."""
+        """Send a validated Compact 9000 BTU capture frame."""
         try:
             state = parse_hex_code(call.data[CONF_CODE])
-        except CarloMilanoValidationError as err:
+        except Compact9000BtuValidationError as err:
             raise ServiceValidationError(
                 translation_domain=DOMAIN,
                 translation_key="invalid_hex_code",
                 translation_placeholders={"error": str(err)},
             ) from err
 
-        await async_send_carlo_milano(
+        await async_send_compact_9000_btu(
             hass,
             call.data[CONF_ENTITY_ID],
             state,
@@ -147,7 +147,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     async def async_send_max_cool(call: ServiceCall) -> None:
         """Send the strongest confirmed remote-sendable COOL state."""
         state = build_max_cool_state(swing=call.data[CONF_SWING])
-        await async_send_carlo_milano(
+        await async_send_compact_9000_btu(
             hass,
             call.data[CONF_ENTITY_ID],
             state,
@@ -156,7 +156,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         )
 
     async def async_send_state(call: ServiceCall) -> None:
-        """Build and send a Carlo Milano state frame."""
+        """Build and send a Compact 9000 BTU state frame."""
         try:
             state = build_state(
                 power=call.data[CONF_POWER],
@@ -167,14 +167,14 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
                 swing=call.data[CONF_SWING],
                 timer_hours=call.data[CONF_TIMER_HOURS],
             )
-        except CarloMilanoValidationError as err:
+        except Compact9000BtuValidationError as err:
             raise ServiceValidationError(
                 translation_domain=DOMAIN,
                 translation_key="invalid_state",
                 translation_placeholders={"error": str(err)},
             ) from err
 
-        await async_send_carlo_milano(
+        await async_send_compact_9000_btu(
             hass,
             call.data[CONF_ENTITY_ID],
             state,
